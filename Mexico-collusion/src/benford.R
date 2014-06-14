@@ -18,7 +18,7 @@ contractor.error <- function(contractor.df) {
   p.expected <- benford(as.numeric(names(p.observed)))
   count.expected <- round(nrow(contractor.df) * p.expected)
   c(ss.error = sum((p.observed - p.expected)^2),
-    chisq.p = chisq.test(p.observed, p.expected)$p.value,
+    chisq.p = chisq.test(p.observed, p = p.expected)$p.value,
    #chisq.p = chisq.test(count.observed, count.expected)$p.value
    #ks.p = ks.test(p.observed, p.expected)$p.value # wrong
     n.contracts = nrow(contractor.df)
@@ -42,7 +42,7 @@ p <- function() {
   dev.off()
 }
 
-# result <- ddply(subset(mex, amount > 1), 'contractor_id', contractor.error)
+result <- ddply(subset(mex, amount > 1), 'contractor_id', contractor.error)
 p2 <- function() {
   p <- ggplot(result) + aes(x = n.contracts, y = ss.error, label = contractor_id) + geom_text() +
     xlab('Number of contracts by the contractor') +
