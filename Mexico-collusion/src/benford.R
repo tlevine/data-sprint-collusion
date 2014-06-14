@@ -12,11 +12,14 @@ benford <- function(d) {
 }
 
 contractor.error <- function(contractor.df) {
-  d <- leading.digit(contractor.df$amount)
+  d <- as.numeric(as.character(factor(leading.digit(contractor.df$amount), levels = 1:9)))
   p.observed <- table(d) / nrow(contractor.df)
   p.expected <- benford(as.numeric(names(p.observed)))
-  c(ss.error = sum((p.expected - p.observed)^2))
+  c(ss.error = sum((p.observed - p.expected)^2),
+   #chisq.p = chisq.test(p.observed, p.expected)$p.value
+    ks.p = ks.test(p.observed, p.expected)$p.value
+  )
 }
 
-# result <- ddply(subset(mex, amount > 1), 'contractor_id', contractor.error)
-print(subset(result, ss.error > 0.9))
+result <- ddply(subset(mex, amount > 1), 'contractor_id', contractor.error)
+# print(subset(result, ss.error > 0.9))
