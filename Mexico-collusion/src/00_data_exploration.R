@@ -1,0 +1,2 @@
+library(ProjectTemplate)
+reload.project()
