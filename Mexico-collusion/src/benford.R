@@ -18,9 +18,10 @@ contractor.error <- function(contractor.df) {
   p.expected <- benford(as.numeric(names(p.observed)))
   count.expected <- round(nrow(contractor.df) * p.expected)
   c(ss.error = sum((p.observed - p.expected)^2),
-    chisq.p = chisq.test(p.observed, p.expected)$p.value
+    chisq.p = chisq.test(p.observed, p.expected)$p.value,
    #chisq.p = chisq.test(count.observed, count.expected)$p.value
    #ks.p = ks.test(p.observed, p.expected)$p.value # wrong
+    n.contracts = nrow(contractor.df)
   )
 }
 
@@ -34,9 +35,10 @@ plot.contractor <- function(contractor.df) {
   lines(1:9, p.observed, col = 2)
 }
 
-# result <- ddply(subset(mex, amount > 1), 'contractor_id', contractor.error)
-# print(subset(result, ss.error > 0.9))
+result <- ddply(subset(mex, amount > 1), 'contractor_id', contractor.error)
 
-pdf('leading-digits.pdf', width = 11, height = 8.5)
-d_ply(subset(mex, amount > 1), 'contractor_id', plot.contractor)
-dev.off()
+p <- function() {
+  pdf('leading-digits.pdf', width = 11, height = 8.5)
+  d_ply(subset(mex, amount > 1), 'contractor_id', plot.contractor)
+  dev.off()
+}
