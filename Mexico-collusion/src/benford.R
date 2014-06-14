@@ -12,14 +12,30 @@ benford <- function(d) {
 }
 
 contractor.error <- function(contractor.df) {
-  d <- as.numeric(as.character(factor(leading.digit(contractor.df$amount), levels = 1:9)))
-  p.observed <- table(d) / nrow(contractor.df)
+  d <- factor(leading.digit(contractor.df$amount), levels = 1:9)
+  count.observed <- table(d)
+  p.observed <- table(d) / count.observed
   p.expected <- benford(as.numeric(names(p.observed)))
+  count.expected <- round(nrow(contractor.df) * p.expected)
   c(ss.error = sum((p.observed - p.expected)^2),
-   #chisq.p = chisq.test(p.observed, p.expected)$p.value
-    ks.p = ks.test(p.observed, p.expected)$p.value
+    chisq.p = chisq.test(p.observed, p.expected)$p.value
+   #chisq.p = chisq.test(count.observed, count.expected)$p.value
+   #ks.p = ks.test(p.observed, p.expected)$p.value # wrong
   )
 }
 
-result <- ddply(subset(mex, amount > 1), 'contractor_id', contractor.error)
+plot.contractor <- function(contractor.df) {
+  d <- factor(leading.digit(contractor.df$amount), levels = 1:9)
+  p.observed <- table(d) / count.observed
+  p.expected <- benford(1:9)
+  plot(p.expected ~ 1:9, xlab = 'Leading digit', 'Proportion of leading digits',
+       main = 'Comparison of leading digits to the Benford distribution')
+  points(p.observed ~ 1:9)
+}
+
+# result <- ddply(subset(mex, amount > 1), 'contractor_id', contractor.error)
 # print(subset(result, ss.error > 0.9))
+
+pdf('leading-digits.pdf', width = 11, height = 8.5)
+d_ply(subset(mex, amount > 1), 'contractor_id', plot.contractor)
+dev.off()
