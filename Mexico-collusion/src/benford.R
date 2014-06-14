@@ -35,10 +35,18 @@ plot.contractor <- function(contractor.df) {
   lines(1:9, p.observed, col = 2)
 }
 
-result <- ddply(subset(mex, amount > 1), 'contractor_id', contractor.error)
 
 p <- function() {
   pdf('leading-digits.pdf', width = 11, height = 8.5)
   d_ply(subset(mex, amount > 1), 'contractor_id', plot.contractor)
   dev.off()
+}
+
+# result <- ddply(subset(mex, amount > 1), 'contractor_id', contractor.error)
+p2 <- function() {
+  p <- ggplot(result) + aes(x = n.contracts, y = ss.error, label = contractor_id) + geom_text() +
+    xlab('Number of contracts by the contractor') +
+    ylab("Sum of squared distance from Benford's distribution") +
+    ggtitle("Applying Benford's Law to contract amounts")
+  ggsave('benford.png', p)
 }
